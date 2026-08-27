@@ -1,0 +1,809 @@
+/* PathWay — paleta propia (slate + azul marino) */
+.pathway-root {
+  --pw-bg: #0c1118;
+  --pw-surface: #161d28;
+  --pw-surface-2: #1e2735;
+  --pw-border: #2a3548;
+  --pw-text: #e8edf4;
+  --pw-muted: #8b9cb3;
+  /* Acento principal: azul marino legible sobre fondo oscuro */
+  --pw-accent: #5b7eb8;
+  --pw-accent-dim: rgba(91, 126, 184, 0.18);
+  --pw-warn: #7eb3e8;
+  --pw-danger: #e07070;
+  min-height: 100vh;
+  background: var(--pw-bg);
+  color: var(--pw-text);
+  font-family: var(--font-pathway), system-ui, sans-serif;
+}
+
+/* Enlaces en texto plano; CTAs usan .pathway-btn-* o clases bg-* */
+.pathway-root a:not([class*="pathway-btn"]):not([class*="bg-"]) {
+  color: var(--pw-accent);
+}
+
+.pathway-root a.pathway-btn-primary,
+.pathway-root a.pathway-btn-primary:visited {
+  color: #0a1018 !important;
+}
+
+.pathway-card {
+  background: var(--pw-surface);
+  border: 1px solid var(--pw-border);
+  border-radius: 16px;
+}
+
+.pathway-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.25;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.pathway-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pathway-btn:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.pathway-root button.pathway-btn-primary,
+.pathway-btn-primary {
+  background: var(--pw-accent);
+  color: #0a1018 !important;
+}
+
+.pathway-root button.pathway-btn-ghost,
+.pathway-btn-ghost {
+  background: var(--pw-surface-2);
+  color: var(--pw-text) !important;
+  border: 1px solid var(--pw-border);
+}
+
+.pathway-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--pw-border);
+  background: var(--pw-surface-2);
+  color: var(--pw-text);
+  font-size: 14px;
+}
+
+.pathway-input-with-icon {
+  padding-left: 40px;
+}
+
+.pathway-input:focus {
+  outline: 2px solid var(--pw-accent);
+  outline-offset: 0;
+}
+
+.pathway-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pw-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Panel agencia — legaltech sobrio */
+.pathway-root .panel-surface {
+  --pw-bg: #0f1419;
+  --pw-surface: #171e26;
+  --pw-surface-2: #1f2833;
+  --pw-border: #2d3848;
+  --pw-text: #eef1f5;
+  --pw-muted: #94a3b8;
+  --pw-accent: #4a6fa5;
+  --pw-accent-dim: rgba(74, 111, 165, 0.15);
+  --pw-warn: #7eb3e8;
+  --pw-success: #3d9b6a;
+  --pw-success-dim: rgba(61, 155, 106, 0.15);
+  --pw-warning: #c9a227;
+  --pw-warning-dim: rgba(201, 162, 39, 0.15);
+  --pw-danger: #c45c5c;
+  --pw-danger-dim: rgba(196, 92, 92, 0.15);
+  min-height: 100vh;
+  background: var(--pw-bg);
+  color: var(--pw-text);
+}
+
+/* Portal cliente (Magic Link): calma, mobile-first */
+.pathway-root .portal-magic-surface {
+  --pw-bg: #f4f6f8;
+  --pw-surface: #ffffff;
+  --pw-surface-2: #eef1f5;
+  --pw-border: #dde3ea;
+  --pw-text: #1a2332;
+  --pw-muted: #5c6b7e;
+  --pw-accent: #0d9488;
+  --pw-accent-dim: rgba(13, 148, 136, 0.12);
+  --pw-warn: #d97706;
+  --pw-danger: #dc2626;
+  min-height: 100vh;
+  background: var(--pw-bg);
+  color: var(--pw-text);
+}
+
+/* Landing /pathway — SaaS B2B (inspirado en flujo Residexa, paleta PathWay) */
+.pathway-root .pathway-landing-saas,
+.pathway-root .pathway-landing-minimal {
+  --pw-bg: #0c1118;
+  --pw-surface: #161d28;
+  --pw-surface-2: #1e2735;
+  --pw-border: #2a3548;
+  --pw-text: #e8edf4;
+  --pw-muted: #8b9cb3;
+  --pw-accent: #5b7eb8;
+  --pw-accent-dim: rgba(91, 126, 184, 0.18);
+  --pw-danger: #e07070;
+  background: var(--pw-bg);
+  color: var(--pw-text);
+  font-feature-settings: "ss01" on, "cv01" on;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-nav {
+  background: rgba(12, 17, 24, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-nav-mark {
+  border: 1px solid var(--pw-border);
+  border-radius: 12px;
+  color: var(--pw-accent);
+  background: var(--pw-accent-dim);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-wordmark {
+  font-family: var(--font-pathway), system-ui, sans-serif;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-wordmark-path {
+  color: #ffffff;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-wordmark-way {
+  color: var(--pw-accent);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-nav-sections {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 0.25rem;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-nav-sections::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .pathway-root .pathway-landing-saas .pathway-landing-nav-sections {
+    gap: 1.75rem;
+  }
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-nav-link {
+  color: var(--pw-muted);
+  transition: color 0.15s;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-nav-link:hover {
+  color: var(--pw-text);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border: 1px solid var(--pw-border);
+  border-radius: 10px;
+  background: var(--pw-surface);
+  color: var(--pw-text);
+  cursor: pointer;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pw-accent);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-section-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-family: var(--font-pathway), system-ui, sans-serif;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-section {
+  padding: 4.5rem 0;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-section-alt {
+  background: var(--pw-surface);
+  border-top: 1px solid var(--pw-border);
+  border-bottom: 1px solid var(--pw-border);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-feature-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--pw-border);
+  background: var(--pw-surface);
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-feature-card:hover {
+  border-color: rgba(91, 126, 184, 0.45);
+  transform: translateY(-2px);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  color: var(--pw-accent);
+  background: var(--pw-accent-dim);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-step-card {
+  padding: 1.25rem;
+  border-radius: 16px;
+  border: 1px solid var(--pw-border);
+  background: var(--pw-bg);
+  height: 100%;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-step-num {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--pw-accent);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-compare-grid {
+  display: grid;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .pathway-root .pathway-landing-saas .pathway-landing-compare-grid {
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-compare-col {
+  padding: 1.75rem;
+  border-radius: 16px;
+  border: 1px solid var(--pw-border);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-compare-old {
+  background: var(--pw-surface);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-compare-new {
+  background: linear-gradient(145deg, rgba(91, 126, 184, 0.12), var(--pw-surface));
+  border-color: rgba(91, 126, 184, 0.35);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-compare-vs {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--pw-muted);
+}
+
+@media (min-width: 768px) {
+  .pathway-root .pathway-landing-saas .pathway-landing-compare-vs {
+    display: flex;
+  }
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-faq {
+  border: 1px solid var(--pw-border);
+  border-radius: 12px;
+  background: var(--pw-bg);
+  overflow: hidden;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-faq summary {
+  padding: 1rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-faq p {
+  margin: 0;
+  padding: 0 1.25rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--pw-muted);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-cta-band {
+  position: relative;
+  padding: 3.5rem 1.5rem;
+  border-radius: 20px;
+  border: 1px solid rgba(91, 126, 184, 0.35);
+  background: linear-gradient(135deg, rgba(91, 126, 184, 0.15), var(--pw-surface));
+  overflow: hidden;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-cta-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(91, 126, 184, 0.2), transparent 60%);
+  pointer-events: none;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-footer {
+  border-color: var(--pw-border);
+  background: var(--pw-bg);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #0a1018 !important;
+  background: var(--pw-accent);
+  border-radius: 12px;
+  border: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-cta-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--pw-text) !important;
+  background: transparent;
+  border: 1px solid var(--pw-border);
+  border-radius: 12px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-cta-secondary:hover {
+  border-color: var(--pw-accent);
+  color: var(--pw-accent) !important;
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-pricing-card {
+  border: 1px solid color-mix(in srgb, var(--pw-accent) 35%, var(--pw-border));
+  border-radius: 1.25rem;
+  padding: 1.75rem 1.5rem;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, color-mix(in srgb, var(--pw-accent) 14%, transparent), transparent 55%),
+    var(--pw-surface);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+@media (min-width: 640px) {
+  .pathway-root .pathway-landing-saas .pathway-landing-pricing-card {
+    padding: 2rem 2.25rem;
+  }
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-pricing-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--pw-accent);
+  background: var(--pw-accent-dim);
+  border: 1px solid color-mix(in srgb, var(--pw-accent) 30%, transparent);
+}
+
+.pathway-root .pathway-landing-saas .pathway-landing-headline-accent {
+  font-weight: 600;
+  background: linear-gradient(100deg, #dbe8f8 0%, var(--pw-accent) 45%, #8fb8ec 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pathway-root .pathway-landing-minimal {
+  --pw-bg: #050708;
+  --pw-surface: #090c0f;
+  --pw-surface-2: #0d1116;
+  --pw-border: rgba(232, 237, 244, 0.06);
+  --pw-text: #eef2f6;
+  --pw-muted: #6d7a8a;
+  --pw-accent: #a4c4ea;
+  --pw-accent-dim: rgba(164, 196, 234, 0.12);
+  --pw-warn: #8aa4c4;
+  background: var(--pw-bg);
+  /* Cabecera y marca alineadas con el hero (Outfit, tracking amplio) */
+  font-feature-settings: "ss01" on, "cv01" on;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav {
+  font-family: var(--font-pathway), system-ui, sans-serif;
+  background: rgba(6, 8, 9, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--pw-border);
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(232, 237, 244, 0.08);
+  border-radius: 2px;
+  color: var(--pw-accent);
+  background: var(--pw-accent-dim);
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-home:hover .pathway-landing-nav-mark {
+  border-color: rgba(158, 184, 216, 0.35);
+  color: #b8cce6;
+  background: rgba(158, 184, 216, 0.12);
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.12em;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  font-family: var(--font-pathway), system-ui, sans-serif;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-wordmark span:first-child {
+  color: rgba(238, 242, 246, 0.45);
+  letter-spacing: 0.42em;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-home:hover .pathway-landing-nav-wordmark span:first-child {
+  color: rgba(238, 242, 246, 0.72);
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-wordmark span:last-child {
+  font-weight: 400;
+  letter-spacing: 0.36em;
+  color: var(--pw-accent);
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-home:hover .pathway-landing-nav-wordmark span:last-child {
+  color: #b8cce6;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-actions a {
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav-sep {
+  color: var(--pw-muted);
+  opacity: 0.42;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0 0.15rem;
+  user-select: none;
+}
+
+@media (min-width: 640px) {
+  .pathway-root .pathway-landing-minimal .pathway-landing-nav-actions {
+    gap: 1.75rem;
+  }
+}
+
+/* CTAs del header: misma voz tipográfica que el hero (más fino que el bloque global) */
+.pathway-root .pathway-landing-minimal .pathway-landing-nav .pathway-btn-primary {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  padding: 0.55rem 1.1rem !important;
+  color: #0a1018 !important;
+  background: var(--pw-accent) !important;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav .pathway-landing-cta-ghost {
+  font-size: 10px !important;
+  font-weight: 300 !important;
+  letter-spacing: 0.34em !important;
+  padding: 0.4rem 0 !important;
+  color: var(--pw-muted) !important;
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav .pathway-landing-cta-ghost:hover {
+  color: var(--pw-accent) !important;
+  border-bottom-color: rgba(158, 184, 216, 0.25);
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav .pathway-landing-cta-outline {
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.3em !important;
+  padding: 0.55rem 1rem !important;
+  color: var(--pw-text) !important;
+  border-color: rgba(232, 237, 244, 0.1);
+}
+
+.pathway-root .pathway-landing-minimal .pathway-landing-nav .pathway-landing-cta-outline:hover {
+  border-color: rgba(158, 184, 216, 0.4) !important;
+  color: var(--pw-accent) !important;
+}
+
+@keyframes pathway-grid-shift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 56px 56px, 56px 56px;
+  }
+}
+
+@keyframes pathway-glow-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
+@keyframes pathway-scan-drift {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-32px);
+  }
+}
+
+@keyframes pathway-status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(139, 188, 240, 0.35);
+  }
+  50% {
+    opacity: 0.82;
+    box-shadow: 0 0 14px 2px rgba(139, 188, 240, 0.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pathway-landing-grid,
+  .pathway-landing-hero-glow,
+  .pathway-landing-scanlines,
+  .pathway-landing-status {
+    animation: none !important;
+  }
+
+  .pathway-landing-grid {
+    background-position: 0 0 !important;
+  }
+
+  .pathway-landing-scanlines {
+    transform: none !important;
+  }
+}
+
+.pathway-landing-hero {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.pathway-landing-hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 85% 15%, rgba(158, 184, 216, 0.12), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 10% 80%, rgba(91, 126, 184, 0.07), transparent 50%),
+    radial-gradient(ellipse 35% 50% at 50% 100%, rgba(110, 168, 220, 0.06), transparent 45%);
+  pointer-events: none;
+  animation: pathway-glow-breathe 10s ease-in-out infinite;
+}
+
+.pathway-landing-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(rgba(180, 210, 245, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180, 210, 245, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, black 20%, transparent 72%);
+  pointer-events: none;
+  animation: pathway-grid-shift 48s linear infinite;
+}
+
+.pathway-landing-scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.035;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(200, 220, 245, 0.07) 2px,
+    rgba(200, 220, 245, 0.07) 3px
+  );
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 75%);
+  pointer-events: none;
+  animation: pathway-scan-drift 22s linear infinite;
+}
+
+.pathway-landing-mono {
+  font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+}
+
+.pathway-landing-status {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--pw-accent);
+  box-shadow: 0 0 10px rgba(158, 184, 216, 0.45);
+  animation: pathway-status-pulse 2.8s ease-in-out infinite;
+}
+
+.pathway-landing-chip {
+  color: rgba(158, 184, 216, 0.95);
+  border: 1px solid rgba(158, 184, 216, 0.22);
+  background: rgba(158, 184, 216, 0.06);
+}
+
+.pathway-landing-headline-accent {
+  font-weight: 300;
+  background: linear-gradient(100deg, #dbe8f8 0%, var(--pw-accent) 42%, #8fb8ec 78%, #c9dcf0 100%);
+  background-size: 140% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pathway-landing-index {
+  color: rgba(160, 198, 235, 0.82);
+}
+
+.pathway-root .pathway-landing-cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.65rem 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pw-muted) !important;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.pathway-root .pathway-landing-cta-ghost:hover {
+  color: var(--pw-text) !important;
+  border-bottom-color: var(--pw-border);
+}
+
+.pathway-root .pathway-landing-cta-solid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--pw-bg) !important;
+  background: var(--pw-text);
+  border: 1px solid var(--pw-text);
+  border-radius: 2px;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+
+.pathway-root .pathway-landing-cta-solid:hover {
+  opacity: 0.88;
+}
+
+.pathway-root .pathway-landing-cta-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.35rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--pw-text) !important;
+  border: 1px solid var(--pw-border);
+  border-radius: 2px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.pathway-root .pathway-landing-cta-outline:hover {
+  border-color: rgba(158, 184, 216, 0.35);
+  color: var(--pw-accent) !important;
+}

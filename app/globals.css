@@ -1,26 +1,18 @@
 @import "tailwindcss";
 
+/* Estilos mínimos para rutas fuera de /pathway (p. ej. errores) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0f1419;
+  --text-primary: #e8edf4;
+  --text-muted: #8b9cb3;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
 }

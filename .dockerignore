@@ -1,0 +1,31 @@
+# Dependencias y build local
+node_modules
+.next
+out
+build
+coverage
+
+# Git / IDE
+.git
+.gitignore
+.cursor
+.vscode
+*.md
+!README.md
+
+# Env y secretos (pásalos en runtime / compose)
+.env
+.env.*
+!.env.example
+
+# Tests y ruido
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.pem
+Thumbs.db
+
+# Scripts solo útiles en host (abrir navegador en `npm run dev`)
+scripts/open-browser.cjs
+scripts/print-lan-url.cjs

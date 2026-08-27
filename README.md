@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PathWay (`pathwaysaas`)
 
-## Getting Started
+Front **Next.js** (UI, portal Magic Link, panel `/dashboard` contra tu API). La raíz `/` redirige a `/pathway`.
 
-First, run the development server:
+- **API REST y MongoDB** van en el **servidor Express** (otro repo o carpeta). Este front **no** conecta a Mongo: habla con el API por **`/api/*`**.
+- **Proxy `/api` → Express:** en `next dev`, Next **reenvía por defecto** `/api/*` a `http://localhost:3000/api/*` (igual que `pathway-nextjs-rewrite.example.mjs` en este repo). El navegador sigue viendo `http://localhost:5500/api/...`; la cookie `pw_session` queda en el origen del front. Opcional: `API_PROXY_TARGET` en `.env.local` si tu API no está en el puerto 3000 (reinicia `npm run dev` tras cambiarlo). En **producción** hay que definir `API_PROXY_TARGET` si el API no va en el mismo host que Next.
+- **`JWT_SECRET`:** el **mismo valor** (copiar y pegar) en Express y en `.env.local` de Next. Si no coinciden, el login puede responder 200 pero **no entrarás** en `/dashboard` (el middleware rechaza la cookie). No dejes textos tipo «PON_AQUI…» en `.env.local`.
+- Si tras login o registro vuelves a `/sign-in`, suele ser la cookie `pw_session` que no llega por el proxy: en Express puedes devolver en el JSON **`{ "token": "<jwt>" }`** (el mismo JWT que iría en la cookie); el front lo copia a `pw_session` en el navegador.
+- Crea `.env.local` copiando **`.env.example`** (los `.env*` no están en Git).
+
+## Desarrollo
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Por defecto el front usa el puerto **5500** (`package.json`). Arranca también el **Express** con Mongo y la misma `JWT_SECRET` si usas login Mongo + `/dashboard`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Parches backend** (caducidad magic link + documentos por defecto): carpeta [`pathway-express-patches/`](../pathway-express-patches/README.md) en la raíz del workspace.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Build
 
-## Learn More
+```bash
+npm run build
+npm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Checklist flujo completo (local)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Con Express en `:3000` y front en `:5500`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+bash scripts/smoke-flow.sh
+```
 
-## Deploy on Vercel
+Pasos manuales:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Registro/login agencia → `/dashboard`
+2. Crear expediente → 3 documentos + `magicExpiresAt`
+3. Copiar enlace → portal en ventana privada
+4. Subir pasaporte, domicilio y foto → `progress` sube
+5. Despacho → pestaña **Documentos**: aprobar/rechazar cada slot (mensaje al cliente)
+6. Despacho → pestaña **Revisión**: aprobar o rechazar expediente completo
+7. Cliente ve mensajes en portal; si aprobado → PDF en revisión y portal (`finalPdfUrl`)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**API revisión por documento:** `PATCH /api/cases/:caseId/documents/:docId/review` — el front ya lo llama.
+
+**Nivel 1 (ingesta/extracción):** contrato `ExtractedData` en `lib/api/extractedData.ts`; validación pre-upload en portal; parches backend en `pathway-express-patches/lib/documentIngestionService.js`.
+
+**Nivel 2 (Case Engine + EX-10):** `caseType` en expediente (`MVP-3` | `EX-10`); EX-10 crea 6 slots (pasaporte, domicilio, foto, tasa 790, empadronamiento, antecedentes); checklist automático en ficha; selector de trámite al crear; bloqueo de aprobación si faltan docs.
+
+## Despliegue (staging / producción)
+
+| Componente | Variables clave |
+|------------|-----------------|
+| **Express** | `MONGODB_URI`, `JWT_SECRET`, `PUBLIC_APP_ORIGIN`, `MAGIC_LINK_TTL_DAYS`, Resend (`RESEND_API_KEY`, dominio verificado) |
+| **Next.js** | `API_PROXY_TARGET` (URL interna del API), **mismo** `JWT_SECRET` |
+| **Email reset** | Backend debe enlazar a `{PUBLIC_APP_ORIGIN}/reset-password?token=...` |
+
+Orden recomendado: Mongo → Express → build Next → proxy `/api/*` → dominio + HTTPS → verificar Resend.
+
+Rutas auth front: `/sign-in`, `/sign-up`, `/forgot-password`, `/reset-password?token=`.
