@@ -10,7 +10,7 @@
 
 services:
   traefik:
-    image: traefik:v3.3
+    image: traefik:v3.6.1
     container_name: pathway-traefik
     restart: unless-stopped
     command:
@@ -56,15 +56,14 @@ services:
     expose:
       - "5500"
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=pathway-net
-      - traefik.http.routers.pathway-web.rule=Host(`visalawyer.online`) || Host(`www.visalawyer.online`)
-      - traefik.http.routers.pathway-web.entrypoints=websecure
-      - traefik.http.routers.pathway-web.tls=true
-      - traefik.http.routers.pathway-web.tls.certresolver=le
-      - traefik.http.routers.pathway-web.tls.domains[0].main=visalawyer.online
-      - traefik.http.routers.pathway-web.tls.domains[0].sans=www.visalawyer.online
-      - traefik.http.services.pathway-web.loadbalancer.server.port=5500
+      - "traefik.enable=true"
+      - "traefik.docker.network=pathway-net"
+      - "traefik.http.routers.pathway-web.rule=Host(`visalawyer.online`) || Host(`www.visalawyer.online`)"
+      - "traefik.http.routers.pathway-web.entrypoints=websecure"
+      - "traefik.http.routers.pathway-web.tls=true"
+      - "traefik.http.routers.pathway-web.tls.certresolver=le"
+      - "traefik.http.routers.pathway-web.service=pathway-web"
+      - "traefik.http.services.pathway-web.loadbalancer.server.port=5500"
     networks:
       - pathway-net
 
