@@ -56,14 +56,14 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=pathway-net"
       # HTTPS + Let's Encrypt
-      - "traefik.http.routers.pathway-web.rule=Host(`visalawyer.online`) || Host(`www.visalawyer.online`)"
+      - "traefik.http.routers.pathway-web.rule=Host(`visalawyer.online`)"
       - "traefik.http.routers.pathway-web.entrypoints=websecure"
       - "traefik.http.routers.pathway-web.tls=true"
       - "traefik.http.routers.pathway-web.tls.certresolver=le"
       - "traefik.http.routers.pathway-web.service=pathway-web"
       - "traefik.http.services.pathway-web.loadbalancer.server.port=5500"
       # HTTP → HTTPS (solo tráfico web; no interfiere con ACME TLS challenge)
-      - "traefik.http.routers.pathway-web-http.rule=Host(`visalawyer.online`) || Host(`www.visalawyer.online`)"
+      - "traefik.http.routers.pathway-web-http.rule=Host(`visalawyer.online`)"
       - "traefik.http.routers.pathway-web-http.entrypoints=web"
       - "traefik.http.routers.pathway-web-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -93,7 +93,7 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM: ${RESEND_FROM:-}
       PUBLIC_APP_ORIGIN: https://visalawyer.online
-      CORS_ORIGIN: https://visalawyer.online,https://www.visalawyer.online
+      CORS_ORIGIN: https://visalawyer.online
     expose:
       - "3000"
     healthcheck:
