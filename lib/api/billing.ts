@@ -10,6 +10,8 @@ export type BillingInfo = {
   email?: string;
   status: string;
   active: boolean;
+  /** Fin de la prueba gratuita en app (ISO), si aplica. */
+  trialEndsAt?: string | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   subscriptionId: string | null;
@@ -62,12 +64,12 @@ export async function getBillingStatus(): Promise<
 export async function startCheckout(opts?: {
   successUrl?: string;
   cancelUrl?: string;
-  /** true (default) = trial; false = cobrar desde ya */
+  /** Reservado; Stripe Checkout cobra desde ya. La prueba es en app al registrarse. */
   trial?: boolean;
   /** Email de facturación (editable en PathWay antes de Stripe). */
   customerEmail?: string;
 }): Promise<{ ok: true; url: string; sessionId?: string } | BillingApiError> {
-  const trial = opts?.trial !== false;
+  const trial = opts?.trial === true;
   const r = await fetch(apiUrl("/api/billing/checkout"), {
     method: "POST",
     credentials: "include",

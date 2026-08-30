@@ -18,8 +18,8 @@ const PLAN_INCLUDES = [
 const PRICE_EUR = 75;
 
 /**
- * Precios en landing: un solo CTA de pago (sin trial).
- * El trial vive en la nav / registro. Sin cuenta → registro y Stripe.
+ * Precios en landing: CTA de pago con Stripe.
+ * La prueba gratuita es al registrarse (sin tarjeta).
  */
 export function LandingPricingSection() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export function LandingPricingSection() {
   async function startPaidFlow() {
     if (busy) return;
     setBusy(true);
-    const signUpPath = "/sign-up?checkout=now";
+    const signUpPath = "/sign-up";
 
     try {
       const me = await fetch("/api/auth/me", { credentials: "include" });

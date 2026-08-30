@@ -111,7 +111,7 @@ const FAQ = [
   },
   {
     q: "¿Hay que pagar para registrarse?",
-    a: "Al elegir pagar o probar gratis, primero creas la cuenta del despacho (hace falta para asociar la suscripción) y acto seguido se abre Stripe Checkout. 7 días de prueba o 75 €/mes desde el primer día.",
+    a: "Regístrate gratis y prueba PathWay 7 días sin tarjeta. Si quieres pagar desde el primer día, usa «Suscribirse ahora» en la landing (75 €/mes con Stripe).",
   },
 ];
 
@@ -264,7 +264,7 @@ export default function PathwayLandingPage() {
               Lleve su despacho al siguiente nivel
             </h2>
             <p className="m-0 mb-8 text-sm leading-relaxed sm:text-base" style={{ color: "var(--pw-muted)" }}>
-              Empiece con 7 días gratis. Después 75 €/mes con Stripe.
+              Empiece con 7 días gratis sin tarjeta. Después 75 €/mes si quiere seguir.
             </p>
             <Link href="/sign-up" className="pathway-landing-cta-primary no-underline">
               Probar 7 días gratis
@@ -287,7 +287,7 @@ export default function PathwayLandingPage() {
             <Link href="/sign-in" className="no-underline hover:text-[var(--pw-accent)]">
               Acceder
             </Link>
-            <Link href="/sign-up?checkout=trial" className="no-underline hover:text-[var(--pw-accent)]">
+            <Link href="/sign-up" className="no-underline hover:text-[var(--pw-accent)]">
               Probar gratis 7 días
             </Link>
             <Link href="/acceso" className="no-underline hover:text-[var(--pw-accent)]">

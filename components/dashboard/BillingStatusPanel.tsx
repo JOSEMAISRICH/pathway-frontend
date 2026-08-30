@@ -22,6 +22,7 @@ type Props = {
 };
 
 function statusLabel(billing: BillingInfo): string {
+  if (billing.active && billing.status === "app_trial") return "Prueba gratuita";
   if (billing.active) return "Activo";
   const s = (billing.status || "").toLowerCase();
   if (s === "none" || !s) return "Sin suscripción";
@@ -31,6 +32,14 @@ function statusLabel(billing: BillingInfo): string {
   return s;
 }
 
+function formatTrialRemaining(trialEndsAt: string | null | undefined): string | null {
+  if (!trialEndsAt) return null;
+  const end = new Date(trialEndsAt);
+  if (Number.isNaN(end.getTime()) || end <= new Date()) return null;
+  const days = Math.max(1, Math.ceil((end.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
+  return days === 1 ? "1 día restante" : `${days} días restantes`;
+}
+
 export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,7 +47,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
   const [billing, setBilling] = useState<BillingInfo | null>(null);
   const [stripeConfigured, setStripeConfigured] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [checkoutBusy, setCheckoutBusy] = useState<"trial" | "now" | null>(null);
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [billingEmail, setBillingEmail] = useState("");
   const syncHandled = useRef(false);
@@ -115,7 +124,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
     })();
   }, [searchParams, toast, clearBillingQuery, load, router]);
 
-  async function onSubscribe(trial: boolean) {
+  async function onSubscribe() {
     if (checkoutBusy) return;
     const email = billingEmail.trim().toLowerCase();
     if (!email.includes("@")) {
@@ -123,18 +132,18 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
       toast("Indica un email de facturación válido.", "error");
       return;
     }
-    setCheckoutBusy(trial ? "trial" : "now");
+    setCheckoutBusy(true);
     setError(null);
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const base = returnPath ?? (typeof window !== "undefined" ? window.location.pathname : "/dashboard");
     const err = await redirectToCheckout({
-      trial,
+      trial: false,
       customerEmail: email,
       successUrl: `${origin}${base}?billing=success`,
       cancelUrl: `${origin}${base}?billing=cancel`,
     });
     if (err) {
-      setCheckoutBusy(null);
+      setCheckoutBusy(false);
       if (err.status === 401) {
         router.replace("/sign-in");
         return;
@@ -166,9 +175,11 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
 
   const price = billing ? formatBillingPrice(billing) : "75 €";
   const active = Boolean(billing?.active);
+  const appTrial = active && billing?.status === "app_trial";
+  const trialRemaining = formatTrialRemaining(billing?.trialEndsAt ?? billing?.currentPeriodEnd);
 
   if (variant === "banner") {
-    if (active) {
+    if (active && !appTrial) {
       return (
         <div
           className="pathway-card mb-6 flex flex-col gap-2 border px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between"
@@ -180,6 +191,49 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
           <Link href="/dashboard/planes" className="pathway-btn pathway-btn-ghost py-2 text-xs no-underline">
             Ver plan
           </Link>
+        </div>
+      );
+    }
+
+    if (appTrial) {
+      return (
+        <div
+          className="pathway-card mb-6 flex flex-col gap-3 border p-4 text-sm sm:flex-row sm:items-center sm:justify-between"
+          style={{
+            borderColor: "var(--pw-success)",
+            background: "var(--pw-success-dim)",
+          }}
+        >
+          <div className="min-w-0">
+            <p className="m-0 font-medium text-[var(--pw-text)]">Prueba gratuita activa</p>
+            <p className="m-0 mt-1 text-[var(--pw-muted)]">
+              {trialRemaining
+                ? `${trialRemaining}. Después ${price}/mes si quieres seguir.`
+                : `Tienes acceso completo durante la prueba. Después ${price}/mes.`}
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Link href="/dashboard/planes" className="pathway-btn pathway-btn-ghost py-2 text-xs no-underline">
+              Ver plan
+            </Link>
+            {stripeConfigured ? (
+              <button
+                type="button"
+                className="pathway-btn pathway-btn-primary py-2 text-xs"
+                disabled={checkoutBusy}
+                onClick={() => void onSubscribe()}
+              >
+                {checkoutBusy ? (
+                  <>
+                    <Loader2 className="size-3.5 animate-spin" />
+                    Redirigiendo…
+                  </>
+                ) : (
+                  "Suscribirse ahora"
+                )}
+              </button>
+            ) : null}
+          </div>
         </div>
       );
     }
@@ -200,7 +254,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
             {error
               ? error
               : stripeConfigured
-                ? `Plan PathWay (${price}/mes): prueba 7 días o paga desde ya.`
+                ? `Tu prueba ha terminado. Suscríbete por ${price}/mes para seguir usando PathWay.`
                 : "Falta configurar Stripe en el servidor (STRIPE_SECRET_KEY)."}
           </p>
         </div>
@@ -209,41 +263,24 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
             Detalles
           </Link>
           {stripeConfigured ? (
-            <>
-              <button
-                type="button"
-                className="pathway-btn pathway-btn-primary py-2 text-xs"
-                disabled={checkoutBusy != null}
-                onClick={() => void onSubscribe(true)}
-              >
-                {checkoutBusy === "trial" ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" />
-                    Redirigiendo…
-                  </>
-                ) : (
-                  "7 días gratis"
-                )}
-              </button>
-              <button
-                type="button"
-                className="pathway-btn pathway-btn-ghost py-2 text-xs"
-                disabled={checkoutBusy != null}
-                onClick={() => void onSubscribe(false)}
-              >
-                {checkoutBusy === "now" ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" />
-                    …
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="size-3.5" />
-                    Pagar ya
-                  </>
-                )}
-              </button>
-            </>
+            <button
+              type="button"
+              className="pathway-btn pathway-btn-primary py-2 text-xs"
+              disabled={checkoutBusy}
+              onClick={() => void onSubscribe()}
+            >
+              {checkoutBusy ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin" />
+                  Redirigiendo…
+                </>
+              ) : (
+                <>
+                  <CreditCard className="size-3.5" />
+                  Suscribirse ahora
+                </>
+              )}
+            </button>
           ) : null}
         </div>
       </div>
@@ -290,7 +327,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
                 </div>
               ) : null}
             </dl>
-            {!active && stripeConfigured ? (
+            {(!active || appTrial) && stripeConfigured ? (
               <div className="mt-5 max-w-md">
                 <label className="pathway-label" htmlFor="pw-billing-email">
                   Email de facturación (despacho)
@@ -303,7 +340,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
                   onChange={(e) => setBillingEmail(e.target.value)}
                   placeholder="facturacion@tu-despacho.com"
                   autoComplete="email"
-                  disabled={checkoutBusy != null}
+                  disabled={checkoutBusy}
                 />
               </div>
             ) : null}
@@ -313,40 +350,35 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
                 Pagos no configurados: el backend necesita <code className="text-xs">STRIPE_SECRET_KEY</code>.
               </p>
             ) : null}
+            {appTrial && trialRemaining ? (
+              <p className="m-0 mt-4 text-sm text-[var(--pw-muted)]">{trialRemaining} de prueba gratuita.</p>
+            ) : null}
           </div>
 
           <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-            {active ? (
+            {active && !appTrial ? (
               <span
                 className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium"
                 style={{ background: "var(--pw-success-dim)", color: "var(--pw-success)" }}
               >
                 Suscripción activa
               </span>
+            ) : appTrial ? (
+              <span
+                className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium"
+                style={{ background: "var(--pw-success-dim)", color: "var(--pw-success)" }}
+              >
+                Prueba gratuita
+              </span>
             ) : stripeConfigured ? (
               <div className="flex flex-col gap-2 sm:items-end">
                 <button
                   type="button"
                   className="pathway-btn pathway-btn-primary px-6 py-3"
-                  disabled={checkoutBusy != null}
-                  onClick={() => void onSubscribe(true)}
+                  disabled={checkoutBusy}
+                  onClick={() => void onSubscribe()}
                 >
-                  {checkoutBusy === "trial" ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      Redirigiendo a Stripe…
-                    </>
-                  ) : (
-                    <>Probar 7 días gratis</>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  className="pathway-btn pathway-btn-ghost px-6 py-3"
-                  disabled={checkoutBusy != null}
-                  onClick={() => void onSubscribe(false)}
-                >
-                  {checkoutBusy === "now" ? (
+                  {checkoutBusy ? (
                     <>
                       <Loader2 className="size-4 animate-spin" />
                       Abriendo Stripe…
@@ -354,11 +386,31 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
                   ) : (
                     <>
                       <CreditCard className="size-4" />
-                      Empezar a pagar ya · {price}/mes
+                      Suscribirse ahora · {price}/mes
                     </>
                   )}
                 </button>
               </div>
+            ) : null}
+            {appTrial && stripeConfigured ? (
+              <button
+                type="button"
+                className="pathway-btn pathway-btn-ghost px-6 py-3"
+                disabled={checkoutBusy}
+                onClick={() => void onSubscribe()}
+              >
+                {checkoutBusy ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Abriendo Stripe…
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="size-4" />
+                    Suscribirse antes · {price}/mes
+                  </>
+                )}
+              </button>
             ) : null}
             <Link href="/dashboard" className="pathway-btn pathway-btn-ghost py-2 text-xs no-underline">
               Volver a expedientes

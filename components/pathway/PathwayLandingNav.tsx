@@ -37,7 +37,7 @@ export function PathwayLandingNav() {
           <Link href="/sign-in" className="pathway-landing-nav-link px-1 py-2 text-xs no-underline sm:text-sm">
             Iniciar sesión
           </Link>
-          <Link href="/sign-up?checkout=trial" className="pathway-landing-cta-primary whitespace-nowrap no-underline text-xs sm:text-sm">
+          <Link href="/sign-up" className="pathway-landing-cta-primary whitespace-nowrap no-underline text-xs sm:text-sm">
             Probar gratis 7 días
           </Link>
         </div>
