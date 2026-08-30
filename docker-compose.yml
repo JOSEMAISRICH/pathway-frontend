@@ -19,11 +19,8 @@ services:
       - --providers.docker.network=pathway-net
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
-      - --entrypoints.web.http.redirections.entrypoint.to=websecure
-      - --entrypoints.web.http.redirections.entrypoint.scheme=https
-      - --entrypoints.web.http.redirections.entrypoint.permanent=true
-      - --certificatesresolvers.le.acme.httpchallenge=true
-      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      # Redirección HTTP→HTTPS por router (no global: rompe el reto HTTP-01 de Let's Encrypt)
+      - --certificatesresolvers.le.acme.tlschallenge=true
       - --certificatesresolvers.le.acme.email=${ACME_EMAIL:-admin@visalawyer.online}
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
       - --api.dashboard=true
@@ -58,12 +55,19 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=pathway-net"
+      # HTTPS + Let's Encrypt
       - "traefik.http.routers.pathway-web.rule=Host(`visalawyer.online`) || Host(`www.visalawyer.online`)"
       - "traefik.http.routers.pathway-web.entrypoints=websecure"
       - "traefik.http.routers.pathway-web.tls=true"
       - "traefik.http.routers.pathway-web.tls.certresolver=le"
       - "traefik.http.routers.pathway-web.service=pathway-web"
       - "traefik.http.services.pathway-web.loadbalancer.server.port=5500"
+      # HTTP → HTTPS (solo tráfico web; no interfiere con ACME TLS challenge)
+      - "traefik.http.routers.pathway-web-http.rule=Host(`visalawyer.online`) || Host(`www.visalawyer.online`)"
+      - "traefik.http.routers.pathway-web-http.entrypoints=web"
+      - "traefik.http.routers.pathway-web-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
     networks:
       - pathway-net
 
