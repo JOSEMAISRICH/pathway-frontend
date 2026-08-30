@@ -1,0 +1,111 @@
+# PathWay — Next.js (5500) + Traefik + Let's Encrypt
+#
+# Dominio: visalawyer.online
+#
+# 1) cp .env.compose.example .env
+# 2) Edita .env (ACME_EMAIL, MONGODB_URI, JWT_SECRET, STRIPE…)
+# 3) docker compose up --build -d
+#
+# URLs: https://visalawyer.online/pathway
+
+services:
+  traefik:
+    image: traefik:v3.3
+    container_name: pathway-traefik
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=pathway-net
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL:-admin@visalawyer.online}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --api.dashboard=true
+      - --log.level=INFO
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-letsencrypt:/letsencrypt
+    networks:
+      - pathway-net
+
+  web:
+    image: frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pathway-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      PORT: "5500"
+      HOSTNAME: "0.0.0.0"
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET}
+      API_PROXY_TARGET: http://api:3000
+    expose:
+      - "5500"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=pathway-net
+      - traefik.http.routers.pathway-web.rule=Host(`visalawyer.online`) || Host(`www.visalawyer.online`)
+      - traefik.http.routers.pathway-web.entrypoints=websecure
+      - traefik.http.routers.pathway-web.tls=true
+      - traefik.http.routers.pathway-web.tls.certresolver=le
+      - traefik.http.routers.pathway-web.tls.domains[0].main=visalawyer.online
+      - traefik.http.routers.pathway-web.tls.domains[0].sans=www.visalawyer.online
+      - traefik.http.services.pathway-web.loadbalancer.server.port=5500
+    networks:
+      - pathway-net
+
+  api:
+    image: backend
+    # Si tienes el repo del backend al lado del front, descomenta build:
+    # build:
+    #   context: ../PathWay-Backend
+    #   dockerfile: Dockerfile
+    container_name: pathway-api
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      NODE_ENV: production
+      MONGODB_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-true}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_ID: ${STRIPE_PRICE_ID:-}
+      STRIPE_TRIAL_DAYS: ${STRIPE_TRIAL_DAYS:-7}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-}
+      PUBLIC_APP_ORIGIN: https://visalawyer.online
+      CORS_ORIGIN: https://visalawyer.online,https://www.visalawyer.online
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+    networks:
+      - pathway-net
+
+networks:
+  pathway-net:
+    name: pathway-net
+    driver: bridge
+
+volumes:
+  traefik-letsencrypt:

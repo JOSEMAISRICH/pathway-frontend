@@ -30,9 +30,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (nunca secretos; .env.example sí se versiona)
+# env files (nunca secretos; ejemplos sí se versionan)
 .env*
 !.env.example
+!.env.compose.example
+!backend.env.example
+backend.env
 
 # vercel
 .vercel
