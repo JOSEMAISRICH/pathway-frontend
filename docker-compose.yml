@@ -62,20 +62,20 @@ services:
       HOSTNAME: "0.0.0.0"
       NODE_ENV: production
       JWT_SECRET: ${JWT_SECRET}
-      API_PROXY_TARGET: http://api:3000
+      API_PROXY_TARGET: "http://api:3000"
     expose:
       - "5500"
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=pathway-net"
       # HTTP → HTTPS
-      - "traefik.http.routers.pathway-web-http.rule=Host(`${DOMAIN:-visalawyer.online}`)"
+      - "traefik.http.routers.pathway-web-http.rule=Host(`visalawyer.online`)"
       - "traefik.http.routers.pathway-web-http.entrypoints=web"
       - "traefik.http.routers.pathway-web-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
       # HTTPS + certificado Let's Encrypt
-      - "traefik.http.routers.pathway-web-https.rule=Host(`${DOMAIN:-visalawyer.online}`)"
+      - "traefik.http.routers.pathway-web-https.rule=Host(`visalawyer.online`)"
       - "traefik.http.routers.pathway-web-https.entrypoints=websecure"
       - "traefik.http.routers.pathway-web-https.tls=true"
       - "traefik.http.routers.pathway-web-https.tls.certresolver=letsencrypt"
@@ -119,8 +119,8 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM: ${RESEND_FROM:-}
-      PUBLIC_APP_ORIGIN: https://${DOMAIN:-visalawyer.online}
-      CORS_ORIGIN: https://${DOMAIN:-visalawyer.online}
+      PUBLIC_APP_ORIGIN: "https://visalawyer.online"
+      CORS_ORIGIN: "https://visalawyer.online"
     expose:
       - "3000"
     healthcheck:
