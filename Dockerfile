@@ -6,8 +6,9 @@
 # Run (API en el host o en otra red Docker):
 #   docker run --rm -p 5500:5500 \
 #     -e JWT_SECRET=mismo-que-express \
-#     -e API_PROXY_TARGET=http://host.docker.internal:3000 \
+#     -e API_PROXY_TARGET=http://TU_IP:3000 \
 #     pathway-web
+# En DonWeb/VPS: API_PROXY_TARGET debe ser la URL interna del backend (IP:3000 o nombre del servicio Docker).
 
 # ---- deps ----
 FROM node:22.18.0-alpine AS deps

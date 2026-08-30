@@ -1,0 +1,54 @@
+# PathWay en VPS / DonWeb — front + API en la misma red Docker
+#
+# 1) Copia .env del backend junto a este archivo como backend.env
+#    (desde PathWay-Backend/.env, sin subir a git)
+# 2) Ajusta PUBLIC_APP_ORIGIN y CORS_ORIGIN a http://TU_IP:5500
+# 3) JWT_SECRET igual en web y backend
+#
+#   docker compose -f docker-compose.donweb.yml up --build -d
+#
+# Comprueba:
+#   http://TU_IP:5500/pathway
+#   http://TU_IP:5500/api/_pathway/status  → debe decir ok: true
+
+services:
+  api:
+    image: pathway-backend-api:latest
+    build:
+      context: ../PathWay-Backend
+      dockerfile: Dockerfile
+    container_name: pathway-api
+    env_file:
+      - backend.env
+    environment:
+      PORT: "3000"
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+
+  web:
+    image: pathway-web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pathway-web
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      PORT: "5500"
+      HOSTNAME: "0.0.0.0"
+      NODE_ENV: production
+      # Nombre del servicio Docker (NO uses localhost dentro del contenedor)
+      API_PROXY_TARGET: http://api:3000
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "5500:5500"
+    restart: unless-stopped
