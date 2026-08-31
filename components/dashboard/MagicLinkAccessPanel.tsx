@@ -218,19 +218,19 @@ export function MagicLinkAccessPanel({
 
   return (
     <>
-      <section className="pathway-card space-y-4 p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <h3 className="m-0 text-base font-semibold">Enlace de acceso activo</h3>
+            <h3 className="m-0 text-sm font-semibold sm:text-base">Enlace de acceso activo</h3>
             {expiryLabel ? (
               <p
-                className="m-0 mt-1 text-xs"
+                className="m-0 mt-0.5 text-xs"
                 style={{ color: expired ? "var(--pw-danger)" : "var(--pw-muted)" }}
               >
                 {expiryLabel}
               </p>
             ) : (
-              <p className="m-0 mt-1 text-xs text-[var(--pw-muted)]">Sin fecha de caducidad configurada en el servidor.</p>
+              <p className="m-0 mt-0.5 text-xs text-[var(--pw-muted)]">Sin fecha de caducidad configurada en el servidor.</p>
             )}
           </div>
           {expired ? (
@@ -252,7 +252,7 @@ export function MagicLinkAccessPanel({
         </div>
 
         {expired ? (
-          <p className="m-0 rounded-lg p-3 text-sm" style={{ background: "var(--pw-danger-dim)", color: "var(--pw-danger)" }}>
+          <p className="m-0 rounded-lg p-2.5 text-sm" style={{ background: "var(--pw-danger-dim)", color: "var(--pw-danger)" }}>
             Este enlace ya no sirve para el cliente. Genera uno nuevo y vuelve a enviarlo.
           </p>
         ) : null}
@@ -276,83 +276,87 @@ export function MagicLinkAccessPanel({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="pathway-btn pathway-btn-ghost text-sm"
-            onClick={() => void copyInviteMessage()}
-            disabled={expired}
-          >
-            <ClipboardCopy className="size-4" />
-            Copiar mensaje para el cliente
-          </button>
-          {hasEmail ? (
-            <button type="button" className="pathway-btn pathway-btn-ghost text-sm" disabled={emailBusy || expired} onClick={() => void resendEmail()}>
-              <Mail className="size-4" />
-              {emailBusy ? "Enviando…" : "Enviar por correo"}
-            </button>
-          ) : null}
-        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-2">
+            <p className="m-0 text-[10px] font-medium uppercase tracking-wide text-[var(--pw-muted)]">Compartir</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="pathway-btn pathway-btn-ghost text-sm"
+                onClick={() => void copyInviteMessage()}
+                disabled={expired}
+              >
+                <ClipboardCopy className="size-4" />
+                Copiar mensaje
+              </button>
+              {hasEmail ? (
+                <button
+                  type="button"
+                  className="pathway-btn pathway-btn-ghost text-sm"
+                  disabled={emailBusy || expired}
+                  onClick={() => void resendEmail()}
+                >
+                  <Mail className="size-4" />
+                  {emailBusy ? "Enviando…" : "Enviar por correo"}
+                </button>
+              ) : null}
+            </div>
+          </div>
 
-        <div>
-          <label className="pathway-label" htmlFor="case-client-phone-active">
-            Teléfono del cliente (WhatsApp)
-          </label>
-          <input
-            id="case-client-phone-active"
-            type="tel"
-            className="pathway-input"
-            value={clientPhoneInput}
-            onChange={(e) => onClientPhoneChange(e.target.value)}
-            placeholder="+34 600 000 000"
-            disabled={expired}
-          />
-          <p className="m-0 mt-1.5 text-xs text-[var(--pw-muted)]">
-            Usa prefijo internacional (<strong>+34</strong> en España). Sin teléfono válido, WhatsApp solo abre la lista de chats.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            style={{ background: "var(--pw-success)" }}
-            disabled={!waHref || expired}
-            onClick={() => waHref && window.open(waHref, "_blank", "noopener,noreferrer")}
-          >
-            <MessageCircle className="size-4" />
-            WhatsApp al cliente
-          </button>
-          {waPickHref ? (
-            <button
-              type="button"
-              className="pathway-btn pathway-btn-ghost text-sm"
+          <div className="space-y-2">
+            <label className="pathway-label" htmlFor="case-client-phone-active">
+              Teléfono (WhatsApp)
+            </label>
+            <input
+              id="case-client-phone-active"
+              type="tel"
+              className="pathway-input"
+              value={clientPhoneInput}
+              onChange={(e) => onClientPhoneChange(e.target.value)}
+              placeholder="+34 600 000 000"
               disabled={expired}
-              onClick={() => window.open(waPickHref, "_blank", "noopener,noreferrer")}
-            >
-              <MessageCircle className="size-4" />
-              WhatsApp (elegir contacto)
-            </button>
-          ) : null}
-          <button
-            type="button"
-            className="pathway-btn pathway-btn-ghost text-sm"
-            disabled={magicBusy}
-            onClick={() => setRegenerateOpen(true)}
-          >
-            <RefreshCw className="size-4" />
-            Generar enlace nuevo
-          </button>
+            />
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                style={{ background: "var(--pw-success)" }}
+                disabled={!waHref || expired}
+                onClick={() => waHref && window.open(waHref, "_blank", "noopener,noreferrer")}
+              >
+                <MessageCircle className="size-4" />
+                WhatsApp
+              </button>
+              {waPickHref ? (
+                <button
+                  type="button"
+                  className="pathway-btn pathway-btn-ghost text-sm"
+                  disabled={expired}
+                  onClick={() => window.open(waPickHref, "_blank", "noopener,noreferrer")}
+                >
+                  Elegir contacto
+                </button>
+              ) : null}
+              <button
+                type="button"
+                className="pathway-btn pathway-btn-ghost text-sm"
+                disabled={magicBusy}
+                onClick={() => setRegenerateOpen(true)}
+              >
+                <RefreshCw className="size-4" />
+                Nuevo enlace
+              </button>
+            </div>
+          </div>
         </div>
 
         <div
-          className="flex gap-2 rounded-lg border p-3 text-xs leading-relaxed"
+          className="flex gap-2 rounded-lg border p-2.5 text-xs leading-relaxed"
           style={{ borderColor: "var(--pw-border)", color: "var(--pw-muted)" }}
         >
           <Shield className="size-4 shrink-0 text-[var(--pw-accent)]" aria-hidden />
           <p className="m-0">
-            Un enlace = un expediente. No lo publiques. Si crees que se filtró, usa <strong className="text-[var(--pw-text)]">Generar enlace nuevo</strong>{" "}
-            (el anterior dejará de valer si el servidor lo invalida al renovar).
+            Un enlace = un expediente. No lo publiques. Si se filtró, usa <strong className="text-[var(--pw-text)]">Nuevo enlace</strong>.
           </p>
         </div>
       </section>

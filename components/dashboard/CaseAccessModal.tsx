@@ -35,7 +35,7 @@ export function CaseAccessModal({ open, caseData, onClose, onCaseUpdated }: Prop
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Acceso del cliente" size="lg">
+    <Modal open={open} onClose={onClose} title="Acceso del cliente" size="xl">
       <MagicLinkAccessPanel
         caseData={slice}
         clientPhoneInput={clientPhoneInput}
