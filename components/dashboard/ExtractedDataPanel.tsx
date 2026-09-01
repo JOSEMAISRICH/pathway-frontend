@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Pencil, Save, X } from "lucide-react";
 import {
   EDITABLE_IDENTITY_KEYS,
@@ -50,15 +50,14 @@ export function ExtractedDataPanel({
   title = "Datos extraídos (IA)",
   onUpdated,
 }: Props) {
-  const data: ExtractedData | null = normalizeExtractedData(raw, { documentType, documentId, caseId });
+  const data = useMemo(
+    () => normalizeExtractedData(raw, { documentType, documentId, caseId }),
+    [raw, documentType, documentId, caseId],
+  );
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [saveErr, setSaveErr] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (data && editing) setDraft(draftFromData(data));
-  }, [data, editing]);
 
   const startEdit = useCallback(() => {
     if (!data) return;
