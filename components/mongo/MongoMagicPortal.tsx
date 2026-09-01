@@ -366,10 +366,17 @@ export function MongoMagicPortal({ token }: Props) {
               }}
             >
               <div className="flex items-start justify-between gap-2">
-                <p className="font-semibold text-sm m-0 flex items-center gap-2">
-                  {d.label}
-                  {locked && <CheckCircle2 size={16} className="text-green-600 shrink-0" />}
-                </p>
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm m-0 flex items-center gap-2">
+                    {d.label}
+                    {locked && <CheckCircle2 size={16} className="text-green-600 shrink-0" />}
+                  </p>
+                  {isPassportSlot(d) ? (
+                    <p className="m-0 mt-1 text-xs leading-relaxed" style={{ color: "var(--pw-muted)" }}>
+                      Sube solo la página con tu foto y datos personales. No hace falta la portada ni otras páginas (el DNI sí lleva anverso y reverso).
+                    </p>
+                  ) : null}
+                </div>
               </div>
               {rejected && d.feedbackMessage ? (
                 <div

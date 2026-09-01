@@ -78,6 +78,10 @@ export function CreateCaseModal({ open, onClose, onCreated, onReload }: Props) {
       });
       const j = (await r.json().catch(() => ({}))) as CreateCaseResponse & { error?: string; emailError?: string };
       if (!r.ok) {
+        if (r.status === 402) {
+          setCreateErr(j.error?.trim() || "Tu prueba gratuita ha terminado. Suscríbete en Plan para seguir creando expedientes.");
+          return;
+        }
         if (isLikelyApiDownStatus(r.status)) {
           setCreateErr(apiConnectionErrorMessage());
         } else {
@@ -141,7 +145,7 @@ export function CreateCaseModal({ open, onClose, onCreated, onReload }: Props) {
 
   return (
     <Modal open={open} onClose={handleClose} title="Nuevo expediente" description="Datos del cliente y envío del enlace de subida." size="lg">
-      <form onSubmit={(e) => void onSubmit(e)} className="grid gap-4 sm:grid-cols-2">
+      <form autoComplete="off" onSubmit={(e) => void onSubmit(e)} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label className="pathway-label" htmlFor="new-case-type">
             Tipo de trámite
@@ -169,12 +173,21 @@ export function CreateCaseModal({ open, onClose, onCreated, onReload }: Props) {
           </label>
           <input
             id="new-case-name"
+            name="pathway-new-case-client-name"
             className="pathway-input"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
             disabled={busy}
             autoFocus
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="words"
+            spellCheck={false}
+            data-lpignore="true"
+            data-1p-ignore
+            readOnly
+            onFocus={(e) => e.currentTarget.removeAttribute("readonly")}
           />
         </div>
         <div>
@@ -183,12 +196,21 @@ export function CreateCaseModal({ open, onClose, onCreated, onReload }: Props) {
           </label>
           <input
             id="new-case-email"
-            type="email"
+            name="pathway-new-case-client-email"
+            type="text"
+            inputMode="email"
             className="pathway-input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={busy}
             placeholder="Para enviar el enlace"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            data-lpignore="true"
+            data-1p-ignore
+            readOnly
+            onFocus={(e) => e.currentTarget.removeAttribute("readonly")}
           />
         </div>
         <div>
@@ -197,6 +219,7 @@ export function CreateCaseModal({ open, onClose, onCreated, onReload }: Props) {
           </label>
           <input
             id="new-case-phone"
+            name="pathway-new-case-client-phone"
             type="tel"
             inputMode="tel"
             className="pathway-input"
@@ -204,6 +227,13 @@ export function CreateCaseModal({ open, onClose, onCreated, onReload }: Props) {
             onChange={(e) => setClientPhone(e.target.value)}
             disabled={busy}
             placeholder="+34…"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            data-lpignore="true"
+            data-1p-ignore
+            readOnly
+            onFocus={(e) => e.currentTarget.removeAttribute("readonly")}
           />
         </div>
         <div className="sm:col-span-2">
@@ -215,7 +245,7 @@ export function CreateCaseModal({ open, onClose, onCreated, onReload }: Props) {
               disabled={busy}
               className="mt-1 shrink-0"
             />
-            <span className="text-[var(--pw-muted)]">Enviar enlace por correo al crear (requiere email y SMTP en el servidor).</span>
+            <span className="text-[var(--pw-muted)]">Enviar enlace por correo al crear (necesitas indicar el email del cliente).</span>
           </label>
         </div>
         {createErr ? (

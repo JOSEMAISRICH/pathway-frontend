@@ -89,6 +89,10 @@ function SignInForm() {
     if (!sessionOk.ok) {
       const probe = await fetch(apiUrl("/api/cases"), { credentials: "include", method: "GET" });
       if (probe.ok) sessionOk = { ok: true };
+      else if (probe.status === 402) {
+        window.location.assign("/dashboard/planes?expired=1");
+        return;
+      }
     }
     if (!sessionOk.ok) {
       setErr(messageForSessionVerifyFailure(sessionOk.reason));

@@ -51,6 +51,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [billingEmail, setBillingEmail] = useState("");
   const syncHandled = useRef(false);
+  const expiredToastShown = useRef(false);
 
   const clearBillingQuery = useCallback(() => {
     const path = returnPath ?? (typeof window !== "undefined" ? window.location.pathname : "/dashboard");
@@ -79,6 +80,14 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (expiredToastShown.current) return;
+    if (searchParams.get("expired") !== "1") return;
+    if (loading || !billing || billing.active) return;
+    expiredToastShown.current = true;
+    toast("Tu prueba gratuita ha terminado. Suscríbete para seguir usando PathWay.", "default");
+  }, [searchParams, loading, billing, toast]);
 
   useEffect(() => {
     if (syncHandled.current) return;

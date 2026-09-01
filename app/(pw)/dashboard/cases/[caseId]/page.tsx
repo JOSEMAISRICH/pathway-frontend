@@ -20,6 +20,7 @@ import { ExtractedDataPanel } from "@/components/dashboard/ExtractedDataPanel";
 import { PdfPreview } from "@/components/dashboard/PdfPreview";
 import { countUploadedDocuments, documentHasFile, reviewCaseDocument, allUploadedDocumentsApproved, countApprovedDocuments } from "@/lib/api/reviewCaseDocument";
 import { isCasePdfAvailable } from "@/lib/api/casePdf";
+import { subscriptionRequiredPath, isSubscriptionRequiredStatus } from "@/lib/api/subscriptionGate";
 import { DownloadCasePdfButton } from "@/components/dashboard/DownloadCasePdfButton";
 
 type TabId = "documentos" | "checklist" | "acceso" | "revision";
@@ -131,6 +132,11 @@ export default function CaseDetailPage() {
       if (r.status === 401) {
         setLoading(false);
         router.replace("/sign-in");
+        return;
+      }
+      if (isSubscriptionRequiredStatus(r.status)) {
+        setLoading(false);
+        router.replace(subscriptionRequiredPath());
         return;
       }
       if (r.status === 404) {

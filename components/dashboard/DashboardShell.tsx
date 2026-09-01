@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Compass, CreditCard, FolderOpen, LogOut, Plus } from "lucide-react";
+import { Compass, CreditCard, FolderOpen, Loader2, LogOut, Plus } from "lucide-react";
 import { apiUrl } from "@/lib/api/apiUrl";
+import { getBillingStatus } from "@/lib/api/billing";
+import { subscriptionRequiredPath } from "@/lib/api/subscriptionGate";
 import { cn } from "@/lib/utils/cn";
 
 type Props = {
@@ -94,6 +97,44 @@ function DefaultTopbarAction() {
   );
 }
 
+function SubscriptionGate({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const onPlanes = pathname === "/dashboard/planes" || pathname.startsWith("/dashboard/planes/");
+  const [ready, setReady] = useState(onPlanes);
+
+  useEffect(() => {
+    if (onPlanes) {
+      setReady(true);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      const result = await getBillingStatus();
+      if (cancelled) return;
+      if (result.ok && !result.billing.active) {
+        router.replace(subscriptionRequiredPath());
+        return;
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [onPlanes, router, pathname]);
+
+  if (!ready) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center gap-2 text-sm text-[var(--pw-muted)]">
+        <Loader2 className="size-4 animate-spin" />
+        Comprobando acceso…
+      </div>
+    );
+  }
+
+  return children;
+}
+
 export function DashboardShell({ children, topbarAction, topbarTitle, topbarSubtitle }: Props) {
   const pathname = usePathname();
   const isCaseDetail = pathname.startsWith("/dashboard/cases/");
@@ -136,7 +177,9 @@ export function DashboardShell({ children, topbarAction, topbarTitle, topbarSubt
             <div className="shrink-0">{topbarAction ?? (!isCaseDetail && !isPlanes ? <DefaultTopbarAction /> : null)}</div>
           </header>
 
-          <main className="mx-auto w-full max-w-6xl flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
+          <main className="mx-auto w-full max-w-6xl flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <SubscriptionGate>{children}</SubscriptionGate>
+          </main>
         </div>
     </div>
   );

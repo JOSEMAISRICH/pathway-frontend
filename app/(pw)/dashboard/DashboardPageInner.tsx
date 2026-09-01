@@ -20,6 +20,7 @@ import type { Case, CaseListItem } from "@/lib/api/caseTypes";
 import { caseToListItem, parseCaseDetailResponse, parseCasesListResponse, resolveMagicToken, resolvePortalUrl } from "@/lib/api/caseTypes";
 import { prefetchCaseDetailPage } from "@/lib/dashboard/prefetchCaseDetail";
 import { buildClientInviteMessage, copyText } from "@/lib/portal/magicLink";
+import { subscriptionRequiredPath, isSubscriptionRequiredStatus } from "@/lib/api/subscriptionGate";
 import { useToast } from "@/components/ui/Toast";
 
 type Row = CaseListItem;
@@ -44,6 +45,11 @@ export default function DashboardPageInner() {
       if (r.status === 401) {
         setLoading(false);
         router.replace("/sign-in");
+        return;
+      }
+      if (isSubscriptionRequiredStatus(r.status)) {
+        setLoading(false);
+        router.replace(subscriptionRequiredPath());
         return;
       }
       if (r.status === 503) {
