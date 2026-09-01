@@ -106,6 +106,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    volumes:
+      - pathway_uploads:/app/uploads
     environment:
       PORT: "3000"
       NODE_ENV: production
@@ -139,3 +141,4 @@ networks:
 
 volumes:
   traefik-letsencrypt:
+  pathway_uploads:
