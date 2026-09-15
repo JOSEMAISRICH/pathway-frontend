@@ -13,6 +13,7 @@ import { CreateCaseModal, type CreatedCaseResult } from "@/components/dashboard/
 import { CaseAccessModal } from "@/components/dashboard/CaseAccessModal";
 import { CaseRowActions } from "@/components/dashboard/CaseRowActions";
 import { BillingStatusPanel } from "@/components/dashboard/BillingStatusPanel";
+import { DeadlineAlertsBanner } from "@/components/dashboard/DeadlineAlertsBanner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { TableSkeleton } from "@/components/ui/Skeleton";
@@ -188,6 +189,7 @@ export default function DashboardPageInner() {
   return (
     <>
       <BillingStatusPanel variant="banner" returnPath="/dashboard" />
+      <DeadlineAlertsBanner />
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-md flex-1">

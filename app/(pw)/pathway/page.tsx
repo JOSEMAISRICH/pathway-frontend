@@ -99,11 +99,11 @@ const FAQ = [
   },
   {
     q: "¿PathWay valida todos los documentos con IA?",
-    a: "Hoy la extracción IA es del pasaporte (identidad para el EX-10). Domicilio, tasa 790 y el resto se suben, revisan y aprueban en el panel del despacho.",
+    a: "La IA lee el pasaporte (identidad y caducidad) y filtra empadronamiento y tasa 790. Si el archivo no vale, el cliente lo corrige en el portal. El despacho sigue pudiendo aprobar o rechazar a mano.",
   },
   {
     q: "¿Qué trámites hay ahora?",
-    a: "Recogida básica (3 docs) y EX-10 completo (6 docs + checklist automático). Más trámites usarán el mismo motor de casos.",
+    a: "Recogida básica, EX-10, arraigo social, arraigo familiar, reagrupación (EX-15), renovación de residencia y nacionalidad. Cada uno abre sus documentos y checklist en el mismo portal.",
   },
   {
     q: "¿En qué se diferencia de otras herramientas?",
@@ -111,7 +111,7 @@ const FAQ = [
   },
   {
     q: "¿Hay que pagar para registrarse?",
-    a: "Regístrate gratis y prueba PathWay 7 días sin tarjeta. Si quieres pagar desde el primer día, usa «Suscribirse ahora» en la landing (75 €/mes con Stripe).",
+    a: "Regístrate gratis y prueba PathWay 7 días sin tarjeta. Después hay tres planes: Básico 39 €/mes, Profesional 139 €/mes y Enterprise a medida.",
   },
 ];
 
@@ -146,7 +146,7 @@ export default function PathwayLandingPage() {
             </a>
           </div>
           <p className="m-0 mt-8 text-xs" style={{ color: "var(--pw-muted)" }}>
-            75 €/mes · clientes finales usan el enlace del gestor (sin registro).
+            Desde 39 €/mes · clientes finales usan el enlace del gestor (sin registro).
           </p>
         </div>
       </section>
@@ -264,7 +264,7 @@ export default function PathwayLandingPage() {
               Lleve su despacho al siguiente nivel
             </h2>
             <p className="m-0 mb-8 text-sm leading-relaxed sm:text-base" style={{ color: "var(--pw-muted)" }}>
-              Empiece con 7 días gratis sin tarjeta. Después 75 €/mes si quiere seguir.
+              Empiece con 7 días gratis sin tarjeta. Después elija un plan desde 39 €/mes.
             </p>
             <Link href="/sign-up" className="pathway-landing-cta-primary no-underline">
               Probar 7 días gratis

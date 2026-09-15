@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Compass, CreditCard, FolderOpen, Loader2, LogOut, Plus } from "lucide-react";
+import { Compass, CreditCard, FolderOpen, Loader2, LogOut, Plus, Settings } from "lucide-react";
 import { apiUrl } from "@/lib/api/apiUrl";
 import { getBillingStatus } from "@/lib/api/billing";
 import { subscriptionRequiredPath } from "@/lib/api/subscriptionGate";
@@ -23,6 +23,7 @@ function SidebarNav() {
   const router = useRouter();
   const onDashboard = pathname === "/dashboard" || pathname.startsWith("/dashboard/cases");
   const onPlanes = pathname === "/dashboard/planes" || pathname.startsWith("/dashboard/planes/");
+  const onAjustes = pathname === "/dashboard/ajustes" || pathname.startsWith("/dashboard/ajustes/");
 
   async function logout() {
     await fetch(apiUrl("/api/auth/logout"), { method: "POST", credentials: "include" });
@@ -68,6 +69,18 @@ function SidebarNav() {
         >
           <CreditCard className="size-4 shrink-0" />
           Plan
+        </Link>
+        <Link
+          href="/dashboard/ajustes"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium no-underline transition-colors",
+            onAjustes
+              ? "bg-[var(--pw-accent-dim)] text-[var(--pw-accent)]"
+              : "text-[var(--pw-muted)] hover:bg-[var(--pw-surface-2)] hover:text-[var(--pw-text)]",
+          )}
+        >
+          <Settings className="size-4 shrink-0" />
+          Despacho
         </Link>
       </nav>
 
@@ -140,15 +153,18 @@ export function DashboardShell({ children, topbarAction, topbarTitle, topbarSubt
   const isCaseDetail = pathname.startsWith("/dashboard/cases/");
 
   const isPlanes = pathname === "/dashboard/planes" || pathname.startsWith("/dashboard/planes/");
+  const isAjustes = pathname === "/dashboard/ajustes" || pathname.startsWith("/dashboard/ajustes/");
   const title =
-    topbarTitle ?? (isCaseDetail ? "Expediente" : isPlanes ? "Plan" : "Expedientes");
+    topbarTitle ?? (isCaseDetail ? "Expediente" : isPlanes ? "Plan" : isAjustes ? "Despacho" : "Expedientes");
   const subtitle =
     topbarSubtitle ??
     (isCaseDetail
       ? "Revisión y documentación"
       : isPlanes
         ? "Suscripción del despacho"
-        : "Gestión documental del despacho");
+        : isAjustes
+          ? "Marca blanca, equipo y datos del despacho"
+          : "Gestión documental del despacho");
 
   return (
     <div className="panel-surface flex min-h-screen bg-[var(--pw-bg)]">
@@ -174,7 +190,7 @@ export function DashboardShell({ children, topbarAction, topbarTitle, topbarSubt
               </h1>
               <p className="m-0 hidden truncate text-xs text-[var(--pw-muted)] sm:block">{subtitle}</p>
             </div>
-            <div className="shrink-0">{topbarAction ?? (!isCaseDetail && !isPlanes ? <DefaultTopbarAction /> : null)}</div>
+            <div className="shrink-0">{topbarAction ?? (!isCaseDetail && !isPlanes && !isAjustes ? <DefaultTopbarAction /> : null)}</div>
           </header>
 
           <main className="mx-auto w-full max-w-6xl flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">

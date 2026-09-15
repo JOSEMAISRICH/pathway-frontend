@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
       { source: "/agency/dossier/:id", destination: "/dashboard/cases/:id", permanent: false },
       { source: "/agency/planes", destination: "/dashboard/planes", permanent: false },
       { source: "/agency/templates", destination: "/dashboard", permanent: false },
-      { source: "/agency/settings", destination: "/dashboard", permanent: false },
+      { source: "/agency/settings", destination: "/dashboard/ajustes", permanent: false },
       /** Alias panel legacy */
       { source: "/panel", destination: "/dashboard", permanent: false },
       { source: "/panel/login", destination: "/sign-in", permanent: false },

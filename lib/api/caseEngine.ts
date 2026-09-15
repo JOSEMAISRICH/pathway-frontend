@@ -2,7 +2,14 @@
  * Nivel 2 — Case Engine (espejo front de PathWay-Backend/src/lib/caseEngine).
  */
 
-export type CaseTypeId = "MVP-3" | "EX-10";
+export type CaseTypeId =
+  | "MVP-3"
+  | "EX-10"
+  | "ARRAIGO-SOCIAL"
+  | "ARRAIGO-FAMILIAR"
+  | "EX-15"
+  | "RENOVACION"
+  | "NACIONALIDAD";
 
 export type CaseTypeOption = {
   id: CaseTypeId;
@@ -31,6 +38,36 @@ export const CASE_TYPE_OPTIONS: CaseTypeOption[] = [
     description: "Identidad, domicilio, tasa 790, empadronamiento y antecedentes penales.",
     documentsCount: 6,
   },
+  {
+    id: "ARRAIGO-SOCIAL",
+    label: "Arraigo social",
+    description: "Padrón, medios económicos, informe de inserción, antecedentes y tasa 790.",
+    documentsCount: 8,
+  },
+  {
+    id: "ARRAIGO-FAMILIAR",
+    label: "Arraigo familiar",
+    description: "Vínculo familiar, padrón, antecedentes y tasa 790.",
+    documentsCount: 7,
+  },
+  {
+    id: "EX-15",
+    label: "EX-15 — Reagrupación familiar",
+    description: "Familiar reagrupado, vínculo, vivienda, medios económicos y tasa 790.",
+    documentsCount: 8,
+  },
+  {
+    id: "RENOVACION",
+    label: "Renovación de residencia",
+    description: "TIE actual, medios, padrón, foto y tasa 790.",
+    documentsCount: 7,
+  },
+  {
+    id: "NACIONALIDAD",
+    label: "Nacionalidad por residencia",
+    description: "Nacimiento, padrón, domicilio, DELE A2, CCSE, antecedentes y tasa 790-026.",
+    documentsCount: 9,
+  },
 ];
 
 export const DEFAULT_CASE_TYPE: CaseTypeId = "EX-10";
@@ -43,6 +80,14 @@ export const CLIENT_UPLOADABLE_KEYS = new Set([
   "fee_790",
   "empadronamiento",
   "criminal_record",
+  "means_of_life",
+  "integration_report",
+  "family_link",
+  "housing_report",
+  "current_tie",
+  "birth_certificate",
+  "dele_a2",
+  "ccse",
 ]);
 
 export function isCaseDocumentUploadEnabled(key: string): boolean {

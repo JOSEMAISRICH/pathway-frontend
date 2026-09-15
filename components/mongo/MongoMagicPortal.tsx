@@ -271,7 +271,7 @@ export function MongoMagicPortal({ token }: Props) {
     return <PortalMagicSkeleton />;
   }
 
-  const first = data.clientName.trim().split(/\s+/)[0];
+  const personName = data.clientName.trim();
   const caseRejected = data.reviewStatus === "rejected";
   const caseApproved = data.reviewStatus === "approved";
   const pdfHref = data.finalPdfUrl?.trim() || null;
@@ -293,7 +293,7 @@ export function MongoMagicPortal({ token }: Props) {
         <p className="text-sm m-0" style={{ color: "var(--pw-muted)" }}>
           {data.agency.name}
         </p>
-        <h1 className="text-2xl font-bold mt-1 m-0">Hola{first ? `, ${first}` : ""}</h1>
+        <h1 className="text-2xl font-bold mt-1 m-0">Hola{personName ? `, ${personName}` : ""}</h1>
         <p className="text-xs mt-2 m-0" style={{ color: "var(--pw-muted)" }}>
           Progreso documental: {data.progress}%
         </p>

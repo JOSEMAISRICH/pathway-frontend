@@ -1,11 +1,17 @@
 import { apiUrl } from "@/lib/api/apiUrl";
 import { readApiErrorMessage } from "@/lib/api/readApiError";
 
+import type { PlanFeatures, PublicPlan } from "@/lib/api/plans";
+
 export type BillingInfo = {
   configured: boolean;
   plan: string;
-  priceMonthly: number;
+  planName?: string;
+  priceMonthly: number | null;
   currency: string;
+  features?: PlanFeatures;
+  limits?: { maxActiveCases: number | null };
+  accessReason?: string;
   /** Email de la agencia / facturación (prefill). */
   email?: string;
   status: string;
@@ -20,6 +26,7 @@ export type BillingInfo = {
 export type BillingStatusResponse = {
   billing: BillingInfo;
   stripeConfigured: boolean;
+  plans?: PublicPlan[];
 };
 
 export type BillingApiError = {
@@ -30,7 +37,10 @@ export type BillingApiError = {
 
 function formatPrice(billing: Pick<BillingInfo, "priceMonthly" | "currency">): string {
   const currency = (billing.currency || "EUR").toUpperCase();
-  const amount = Number.isFinite(billing.priceMonthly) ? billing.priceMonthly : 75;
+  if (billing.priceMonthly == null || !Number.isFinite(billing.priceMonthly)) {
+    return "A medida";
+  }
+  const amount = billing.priceMonthly;
   try {
     return new Intl.NumberFormat("es-ES", {
       style: "currency",
@@ -58,6 +68,7 @@ export async function getBillingStatus(): Promise<
     ok: true,
     billing: j.billing,
     stripeConfigured: Boolean(j.stripeConfigured),
+    plans: Array.isArray(j.plans) ? j.plans : undefined,
   };
 }
 
@@ -68,6 +79,7 @@ export async function startCheckout(opts?: {
   trial?: boolean;
   /** Email de facturación (editable en PathWay antes de Stripe). */
   customerEmail?: string;
+  plan?: string;
 }): Promise<{ ok: true; url: string; sessionId?: string } | BillingApiError> {
   const trial = opts?.trial === true;
   const r = await fetch(apiUrl("/api/billing/checkout"), {
@@ -79,6 +91,7 @@ export async function startCheckout(opts?: {
       ...(opts?.successUrl ? { successUrl: opts.successUrl } : {}),
       ...(opts?.cancelUrl ? { cancelUrl: opts.cancelUrl } : {}),
       ...(opts?.customerEmail ? { customerEmail: opts.customerEmail } : {}),
+      ...(opts?.plan ? { plan: opts.plan } : {}),
     }),
   });
   if (!r.ok) {
@@ -116,6 +129,7 @@ export async function redirectToCheckout(opts?: {
   cancelUrl?: string;
   trial?: boolean;
   customerEmail?: string;
+  plan?: string;
 }): Promise<BillingApiError | null> {
   const result = await startCheckout(opts);
   if (!result.ok) return result;

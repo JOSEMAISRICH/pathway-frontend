@@ -11,6 +11,7 @@ import {
   syncBillingSession,
   type BillingInfo,
 } from "@/lib/api/billing";
+import { PATHWAY_PLANS, formatPlanPrice, planDisplayName, type PlanId } from "@/lib/api/plans";
 import { useToast } from "@/components/ui/Toast";
 
 type Variant = "banner" | "page";
@@ -133,7 +134,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
     })();
   }, [searchParams, toast, clearBillingQuery, load, router]);
 
-  async function onSubscribe() {
+  async function onSubscribe(planId: PlanId = "basico") {
     if (checkoutBusy) return;
     const email = billingEmail.trim().toLowerCase();
     if (!email.includes("@")) {
@@ -147,6 +148,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
     const base = returnPath ?? (typeof window !== "undefined" ? window.location.pathname : "/dashboard");
     const err = await redirectToCheckout({
       trial: false,
+      plan: planId,
       customerEmail: email,
       successUrl: `${origin}${base}?billing=success`,
       cancelUrl: `${origin}${base}?billing=cancel`,
@@ -182,10 +184,12 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
     );
   }
 
-  const price = billing ? formatBillingPrice(billing) : "75 €";
+  const price = billing ? formatBillingPrice(billing) : "39 €";
+  const planLabel = billing?.planName || planDisplayName(billing?.plan);
   const active = Boolean(billing?.active);
   const appTrial = active && billing?.status === "app_trial";
   const trialRemaining = formatTrialRemaining(billing?.trialEndsAt ?? billing?.currentPeriodEnd);
+  const paidPlan = active && !appTrial;
 
   if (variant === "banner") {
     if (active && !appTrial) {
@@ -195,7 +199,8 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
           style={{ borderColor: "var(--pw-success)", background: "var(--pw-success-dim)" }}
         >
           <p className="m-0 text-[var(--pw-text)]">
-            Plan <span className="font-medium">{billing?.plan ?? "standard"}</span> activo · {price}/mes
+            Plan <span className="font-medium">{planLabel}</span> activo
+            {billing?.priceMonthly != null ? ` · ${price}/mes` : ""}
           </p>
           <Link href="/dashboard/planes" className="pathway-btn pathway-btn-ghost py-2 text-xs no-underline">
             Ver plan
@@ -217,8 +222,8 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
             <p className="m-0 font-medium text-[var(--pw-text)]">Prueba gratuita activa</p>
             <p className="m-0 mt-1 text-[var(--pw-muted)]">
               {trialRemaining
-                ? `${trialRemaining}. Después ${price}/mes si quieres seguir.`
-                : `Tienes acceso completo durante la prueba. Después ${price}/mes.`}
+                ? `${trialRemaining}. Después elige un plan (desde 39 €/mes).`
+                : "Tienes todas las funciones durante la prueba. Después elige un plan."}
             </p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
@@ -226,21 +231,9 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
               Ver plan
             </Link>
             {stripeConfigured ? (
-              <button
-                type="button"
-                className="pathway-btn pathway-btn-primary py-2 text-xs"
-                disabled={checkoutBusy}
-                onClick={() => void onSubscribe()}
-              >
-                {checkoutBusy ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" />
-                    Redirigiendo…
-                  </>
-                ) : (
-                  "Suscribirse ahora"
-                )}
-              </button>
+              <Link href="/dashboard/planes" className="pathway-btn pathway-btn-primary py-2 text-xs no-underline">
+                Elegir plan
+              </Link>
             ) : null}
           </div>
         </div>
@@ -263,7 +256,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
             {error
               ? error
               : stripeConfigured
-                ? `Tu prueba ha terminado. Suscríbete por ${price}/mes para seguir usando PathWay.`
+                ? "Tu prueba ha terminado. Elige un plan para seguir usando PathWay."
                 : "Falta configurar Stripe en el servidor (STRIPE_SECRET_KEY)."}
           </p>
         </div>
@@ -272,24 +265,9 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
             Detalles
           </Link>
           {stripeConfigured ? (
-            <button
-              type="button"
-              className="pathway-btn pathway-btn-primary py-2 text-xs"
-              disabled={checkoutBusy}
-              onClick={() => void onSubscribe()}
-            >
-              {checkoutBusy ? (
-                <>
-                  <Loader2 className="size-3.5 animate-spin" />
-                  Redirigiendo…
-                </>
-              ) : (
-                <>
-                  <CreditCard className="size-3.5" />
-                  Suscribirse ahora
-                </>
-              )}
-            </button>
+            <Link href="/dashboard/planes" className="pathway-btn pathway-btn-primary py-2 text-xs no-underline">
+              Elegir plan
+            </Link>
           ) : null}
         </div>
       </div>
@@ -309,16 +287,17 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
               className="m-0 mt-2 text-2xl font-semibold tracking-tight text-[var(--pw-text)]"
               style={{ fontFamily: "var(--font-pathway), system-ui, sans-serif" }}
             >
-              PathWay · {billing?.plan ?? "standard"}
+              PathWay · {planLabel}
             </h2>
             <p className="m-0 mt-2 text-sm text-[var(--pw-muted)]">
-              Suscripción mensual del despacho. El email de facturación se edita aquí (en Stripe suele
-              quedar fijo una vez existe el cliente).
+              Dos planes. El email de PathWay es de referencia; en Stripe lo escribes tú (campo editable).
             </p>
             <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-[var(--pw-muted)]">Precio</dt>
-                <dd className="m-0 mt-0.5 font-medium text-[var(--pw-text)]">{price}/mes</dd>
+                <dd className="m-0 mt-0.5 font-medium text-[var(--pw-text)]">
+                  {billing?.priceMonthly != null ? `${price}/mes` : price}
+                </dd>
               </div>
               <div>
                 <dt className="text-[var(--pw-muted)]">Estado</dt>
@@ -336,7 +315,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
                 </div>
               ) : null}
             </dl>
-            {(!active || appTrial) && stripeConfigured ? (
+            {stripeConfigured ? (
               <div className="mt-5 max-w-md">
                 <label className="pathway-label" htmlFor="pw-billing-email">
                   Email de facturación (despacho)
@@ -344,11 +323,17 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
                 <input
                   id="pw-billing-email"
                   type="email"
+                  name="pw-invoice-email"
                   className="pathway-input"
                   value={billingEmail}
                   onChange={(e) => setBillingEmail(e.target.value)}
                   placeholder="facturacion@tu-despacho.com"
-                  autoComplete="email"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  data-1p-ignore="true"
+                  data-lpignore="true"
                   disabled={checkoutBusy}
                 />
               </div>
@@ -365,7 +350,7 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
           </div>
 
           <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-            {active && !appTrial ? (
+            {paidPlan ? (
               <span
                 className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-medium"
                 style={{ background: "var(--pw-success-dim)", color: "var(--pw-success)" }}
@@ -379,53 +364,70 @@ export function BillingStatusPanel({ variant = "banner", returnPath }: Props) {
               >
                 Prueba gratuita
               </span>
-            ) : stripeConfigured ? (
-              <div className="flex flex-col gap-2 sm:items-end">
-                <button
-                  type="button"
-                  className="pathway-btn pathway-btn-primary px-6 py-3"
-                  disabled={checkoutBusy}
-                  onClick={() => void onSubscribe()}
-                >
-                  {checkoutBusy ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin" />
-                      Abriendo Stripe…
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="size-4" />
-                      Suscribirse ahora · {price}/mes
-                    </>
-                  )}
-                </button>
-              </div>
-            ) : null}
-            {appTrial && stripeConfigured ? (
-              <button
-                type="button"
-                className="pathway-btn pathway-btn-ghost px-6 py-3"
-                disabled={checkoutBusy}
-                onClick={() => void onSubscribe()}
-              >
-                {checkoutBusy ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    Abriendo Stripe…
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="size-4" />
-                    Suscribirse antes · {price}/mes
-                  </>
-                )}
-              </button>
             ) : null}
             <Link href="/dashboard" className="pathway-btn pathway-btn-ghost py-2 text-xs no-underline">
               Volver a expedientes
             </Link>
           </div>
         </div>
+      </div>
+
+      <div className="mx-auto grid max-w-4xl gap-4 lg:grid-cols-2">
+        {PATHWAY_PLANS.map((plan) => {
+          const current = billing?.plan === plan.id && paidPlan;
+          return (
+            <div key={plan.id} className="pathway-card flex h-full flex-col border p-5">
+              <div className="mb-3 flex items-start justify-between gap-2">
+                <h3 className="m-0 text-base font-semibold">{plan.name}</h3>
+                {plan.highlighted ? (
+                  <span className="text-[10px] font-medium uppercase tracking-widest text-[var(--pw-accent)]">
+                    Popular
+                  </span>
+                ) : null}
+              </div>
+              <p className="m-0 mb-1 text-sm text-[var(--pw-muted)]">{plan.tagline}</p>
+              <p className="m-0 mb-4 text-2xl font-semibold">
+                {formatPlanPrice(plan.priceMonthly)}
+                {plan.priceMonthly != null ? (
+                  <span className="text-sm font-normal text-[var(--pw-muted)]"> / mes</span>
+                ) : null}
+              </p>
+              <ul className="m-0 mb-5 list-none space-y-2 p-0 text-sm text-[var(--pw-muted)]">
+                {plan.includes.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <div className="mt-auto">
+                {current ? (
+                  <p className="m-0 text-sm font-medium" style={{ color: "var(--pw-success)" }}>
+                    Tu plan actual
+                  </p>
+                ) : stripeConfigured ? (
+                  <button
+                    type="button"
+                    className="pathway-btn pathway-btn-primary w-full"
+                    disabled={checkoutBusy}
+                    onClick={() => void onSubscribe(plan.id)}
+                  >
+                    {checkoutBusy ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" />
+                        Abriendo…
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="size-4" />
+                        {paidPlan ? "Cambiar a este plan" : "Suscribirse"}
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <p className="m-0 text-sm text-[var(--pw-muted)]">Pagos no disponibles ahora mismo.</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

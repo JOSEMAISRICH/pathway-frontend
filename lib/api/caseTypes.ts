@@ -159,7 +159,7 @@ export type CreateCaseRequestBody = {
   email?: string;
   clientPhone?: string;
   sendMagicLinkEmail?: boolean;
-  /** Nivel 2 — EX-10 por defecto */
+  /** Nivel 2 — EX-10 por defecto; también arraigo, EX-15, renovación, nacionalidad */
   caseType?: string;
 };
 
